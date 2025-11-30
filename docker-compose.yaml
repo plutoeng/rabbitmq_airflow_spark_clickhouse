@@ -39,13 +39,18 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__WEBSERVER__WORKERS: 2
+      AIRFLOW__WEBSERVER__WORKER_TIMEOUT: 300
+      AIRFLOW__WEBSERVER__WEB_SERVER_WORKER_TIMEOUT: 300
       _PIP_ADDITIONAL_REQUIREMENTS: "pandas numpy pyspark findspark pika clickhouse-connect"
     ports:
       - "8080:8080"
     command: >
       bash -c "
-      airflow db init &&
-      airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com 2>/dev/null || true &&
+      echo 'Waiting for database...' &&
+      sleep 30 &&
+      airflow db check &&
+      echo 'Starting Airflow webserver...' &&
       airflow webserver"
     depends_on:
       postgres:
@@ -55,6 +60,13 @@ services:
       - ./logs:/opt/airflow/logs
       - ./scripts:/opt/airflow/scripts
       - ./data:/opt/airflow/data
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
 
   airflow-scheduler:
     image: apache/airflow:2.7.0
@@ -63,7 +75,13 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
       _PIP_ADDITIONAL_REQUIREMENTS: "pandas numpy pyspark findspark pika clickhouse-connect"
-    command: airflow scheduler
+    command: >
+      bash -c "
+      echo 'Waiting for database...' &&
+      sleep 45 &&
+      airflow db check &&
+      echo 'Starting Airflow scheduler...' &&
+      airflow scheduler"
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,6 +90,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ./scripts:/opt/airflow/scripts
       - ./data:/opt/airflow/data
+    restart: unless-stopped
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
