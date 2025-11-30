@@ -1,0 +1,61 @@
+# Docker
+.dockerignore
+
+# Environment variables
+.env
+.env.local
+.env.prod
+
+# Logs
+logs/
+*.log
+
+# Data directories
+data/
+!data/.gitkeep
+
+# Airflow
+airflow.cfg
+airflow/plugins/__pycache__/
+airflow/webserver_config.py
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.hypothesis/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Spark
+spark-warehouse/
+derby.log
+metastore_db/
+
+# Temporary files
+tmp/
+temp/

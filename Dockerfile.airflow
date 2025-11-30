@@ -1,0 +1,23 @@
+FROM apache/airflow:2.7.0
+
+USER root
+
+# Установка системных зависимостей
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        openjdk-11-jre-headless \
+        curl \
+        wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+USER airflow
+
+# Установка Python пакетов
+RUN pip install --no-cache-dir \
+    clickhouse-connect \
+    clickhouse-driver \
+    pyspark==3.4.0 \
+    apache-airflow-providers-clickhouse \
+    pandas \
+    numpy

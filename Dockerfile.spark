@@ -1,0 +1,11 @@
+FROM jupyter/pyspark-notebook:latest
+
+USER root
+
+# Установка ClickHouse клиента
+RUN pip install --no-cache-dir clickhouse-connect clickhouse-driver
+
+USER jovyan
+
+# Создание рабочей директории
+WORKDIR /home/jovyan/work
