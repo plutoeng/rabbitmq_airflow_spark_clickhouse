@@ -1,7 +1,7 @@
 ### Запуск
 ```bash
 # Клонировать репозиторий
-git clone <repository-url>
+git clone https://github.com/plutoeng/rabbitmq_airflow_spark_clickhouse.git
 cd project
 
 # Запустить все сервисы
